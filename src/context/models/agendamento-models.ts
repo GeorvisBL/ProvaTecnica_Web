@@ -2,11 +2,12 @@
 export type AgendamentoDto = {
     id: number;
     salaId: number;
+    local: string;
     salaNome: string;
     dataAgendamento: string;  
     horaInicio: string;
     horaFim: string;
-    cafe: string;
+    cafe: boolean;
     cafeQuantidade: number;
     cafeDescricao: string;
     responsavel: string;
@@ -18,8 +19,8 @@ export type AgendamentoInputModel = {
     dataAgendamento: string;  
     horaInicio: string;
     horaFim: string;
-    cafe: string;
+    responsavel: string;
+    cafe: boolean;
     cafeQuantidade: number;
     cafeDescricao: string;
-    responsavel: string;
 };

@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import SalasForm from "./salas-form";
 import { SalaDto } from "../../context/models/sala-models";
-import { getSalas } from "../../context/services/sala-services";
+import { deleteSala, getSalas } from "../../context/services/sala-services";
 import {
   Box,
   Button,
   CircularProgress,
-  Dialog,
-  DialogContent,
-  DialogTitle,
   Table,
   TableBody,
   TableCell,
@@ -22,7 +19,6 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -30,31 +26,31 @@ import Swal from "sweetalert2";
 
 const SalasList = () => {
   const [salas, setSalas] = useState<SalaDto[]>([]);
-  const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [open, setOpen] = useState(false);
-  const [titleModal, setTitleModal] = useState<string>("");
+  const [salaId, setSalaId] = useState<number>(0);
+  const [formOpen, setFormOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const result = await getSalas();
-        setMsg(result.msg);
-        if (result.status && result.data) {
-          setSalas(result.data);
-        } else {
-          setError("Nenhum registro encontrado.");
-        }
-      } catch (err) {
-        setError("Erro ao conectar com o servidor.");
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const result = await getSalas();
+
+      if (result.status && result.data) {
+        setSalas(result.data);
+      } else {
+        setError("Nenhum registro encontrado.");
+      }
+    } catch (err) {
+      setError("Erro ao conectar com o servidor.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -80,24 +76,17 @@ const SalasList = () => {
   }
 
   const handleCriate = () => {
-    console.log("Criar item");
-    setTitleModal("Adicionar Sala");
-    setOpen(true);
+    setSalaId(0);
+    setFormOpen(true);
   };
-  const handleView = (id: number) => {
-    console.log("Visualizar item", id);
-    setTitleModal("Visualizar Sala");
-    setOpen(true);
-  };
-  const handleEdite = (id: number) => {
-    console.log("Editar item", id);
-    setTitleModal("Editar Sala");
-    setOpen(true);
-  };
-  const handleDelete = (id: number) => {
-    console.log("Deletar item", id);
 
-    Swal.fire({
+  const handleEdite = (id: number) => {
+    setSalaId(id);
+    setFormOpen(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    const result = await Swal.fire({
       title: "Confirmar",
       text: "Tem certeza que deseja excluir essa sala?",
       icon: "question",
@@ -106,15 +95,51 @@ const SalasList = () => {
       cancelButtonColor: "#8b8a8ab8",
       cancelButtonText: "Cancelar",
       confirmButtonText: "Eliminar",
-    }).then((result) => {
-      if (result.isConfirmed) {
+    });
+
+    if (result.isConfirmed) {
+      const response = await deleteSala(id);
+      if (response.status) {
         Swal.fire({
-          title: "Confirmado!",
-          text: "Registro excluído com sucesso.",
-          icon: "success",
+          toast: true,
+          position: "top-end",
+          icon: response.status ? "success" : "error",
+          title: response.msg,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          width: "auto",
+          customClass: {
+            popup: "swal-toast",
+            title: "swal-toast-title",
+            icon: "swal-toast-icon",
+          },
+        });
+
+        fetchData();
+      } else {
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: response.status ? "success" : "error",
+          title: response.msg,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          width: "auto",
+          customClass: {
+            popup: "swal-toast",
+            title: "swal-toast-title",
+            icon: "swal-toast-icon",
+          },
         });
       }
-    });
+    }
+  };
+
+  const handleSaved = () => {
+    fetchData();
+    setFormOpen(false);
   };
 
   return (
@@ -142,10 +167,10 @@ const SalasList = () => {
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell>ID</TableCell>
+              <TableCell>Cod</TableCell>
               <TableCell>Sala</TableCell>
-              <TableCell>Data de cadastro</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Data de cadastro</TableCell>
               <TableCell align="center">Ações</TableCell>
             </TableRow>
           </TableHead>
@@ -155,15 +180,9 @@ const SalasList = () => {
               <TableRow key={setMsg.id} hover>
                 <TableCell>{setMsg.id.toString().padStart(4, "0")}</TableCell>
                 <TableCell>{setMsg.nome}</TableCell>
-                <TableCell>{setMsg.dataCriacao}</TableCell>
                 <TableCell>{setMsg.ativo ? "Ativo" : "Inativo"}</TableCell>
+                <TableCell>{setMsg.dataCriacao}</TableCell>
                 <TableCell align="center">
-                  <Tooltip title="Visualizar">
-                    <IconButton onClick={() => handleView(setMsg.id)}>
-                      <VisibilityIcon sx={{ color: "#8f8b8b" }} />
-                    </IconButton>
-                  </Tooltip>
-
                   <Tooltip title="Editar">
                     <IconButton onClick={() => handleEdite(setMsg.id)}>
                       <EditIcon sx={{ color: "#379137bd" }} />
@@ -182,13 +201,12 @@ const SalasList = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClick={() => setOpen(false)}>
-        <DialogTitle>{titleModal}</DialogTitle>
-
-        <DialogContent>
-          <SalasForm />
-        </DialogContent>
-      </Dialog>
+      <SalasForm
+        open={formOpen}
+        salaId={salaId}
+        onClose={() => setFormOpen(false)}
+        onSaved={() => handleSaved()}
+      />
     </>
   );
 };
