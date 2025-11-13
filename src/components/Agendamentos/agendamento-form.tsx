@@ -197,9 +197,9 @@ const AgendamentosForm: React.FC<AgendamentosFormProps> = ({
         icon: response.status ? "success" : "error",
         title: response.msg,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 3000,
         timerProgressBar: true,
-        width: "300px",
+        width: "auto",
         customClass: {
           popup: "swal-toast",
           title: "swal-toast-title",
@@ -216,9 +216,9 @@ const AgendamentosForm: React.FC<AgendamentosFormProps> = ({
         icon: "error",
         title: "Erro ao conectar com o servidor.",
         showConfirmButton: false,
-        timer: 1500,
+        timer: 3000,
         timerProgressBar: true,
-        width: "300px",
+        width: "auto",
         customClass: {
           popup: "swal-toast",
           title: "swal-toast-title",
