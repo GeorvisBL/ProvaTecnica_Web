@@ -324,7 +324,9 @@ const AgendamentosForm: React.FC<AgendamentosFormProps> = ({
                               if (!value)
                                 return "A data do agendamento é obrigatória";
 
-                              const dataSelecionada = new Date(value);
+                              const [ano, mes, dia] = value.split("-").map(Number);
+                              const dataSelecionada = new Date( ano, mes - 1, dia );
+
                               const hoje = new Date();
                               dataSelecionada.setHours(0, 0, 0, 0);
                               hoje.setHours(0, 0, 0, 0);
@@ -355,17 +357,29 @@ const AgendamentosForm: React.FC<AgendamentosFormProps> = ({
                           control={control}
                           rules={{
                             required: "A hora de início é obrigatória",
-                            validate: (value) => {
+                            validate: (value, formValues) => {
                               if (!value)
                                 return "A hora de início é obrigatória";
 
+                              const { dataAgendamento } = formValues;
+                              if (!dataAgendamento)
+                                return "Selecione uma data antes de definir o horário";
+
+                              const [ano, mes, dia] = dataAgendamento.split("-").map(Number);
+                              const [hora, minuto] = value.split(":").map(Number);
+
+                              const dataHoraSelecionada = new Date( ano, mes - 1, dia, hora, minuto );
+                              const agora = new Date();
+
                               const hoje = new Date();
-                              const dataSelecionada = new Date();
-                              const [hora, minuto] = value
-                                .split(":")
-                                .map(Number);
-                              dataSelecionada.setHours(hora, minuto, 0, 0);
-                              if (dataSelecionada < hoje) {
+                              hoje.setHours(0, 0, 0, 0);
+                              const dataSelecionada = new Date( ano, mes - 1, dia );
+                              dataSelecionada.setHours(0, 0, 0, 0);
+
+                              if (
+                                dataSelecionada.getTime() === hoje.getTime() &&
+                                dataHoraSelecionada < agora
+                              ) {
                                 return "A hora não pode ser menor que a hora atual";
                               }
 

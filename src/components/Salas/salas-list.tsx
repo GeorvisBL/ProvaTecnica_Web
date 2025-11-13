@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SalasForm from "./salas-form";
 import { SalaDto } from "../../context/models/sala-models";
-import { deleteSala, getSalas } from "../../context/services/sala-services";
+import { getSalas } from "../../context/services/sala-services";
 import {
   Box,
   Button,
@@ -20,9 +20,6 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-
-import Swal from "sweetalert2";
 
 const SalasList = () => {
   const [salas, setSalas] = useState<SalaDto[]>([]);
@@ -85,58 +82,6 @@ const SalasList = () => {
     setFormOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    const result = await Swal.fire({
-      title: "Confirmar",
-      text: "Tem certeza que deseja excluir essa sala?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#b72525b8",
-      cancelButtonColor: "#8b8a8ab8",
-      cancelButtonText: "Cancelar",
-      confirmButtonText: "Eliminar",
-    });
-
-    if (result.isConfirmed) {
-      const response = await deleteSala(id);
-      if (response.status) {
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: response.status ? "success" : "error",
-          title: response.msg,
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          width: "auto",
-          customClass: {
-            popup: "swal-toast",
-            title: "swal-toast-title",
-            icon: "swal-toast-icon",
-          },
-        });
-
-        fetchData();
-      } else {
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: response.status ? "success" : "error",
-          title: response.msg,
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          width: "auto",
-          customClass: {
-            popup: "swal-toast",
-            title: "swal-toast-title",
-            icon: "swal-toast-icon",
-          },
-        });
-      }
-    }
-  };
-
   const handleSaved = () => {
     fetchData();
     setFormOpen(false);
@@ -186,12 +131,6 @@ const SalasList = () => {
                   <Tooltip title="Editar">
                     <IconButton onClick={() => handleEdite(setMsg.id)}>
                       <EditIcon sx={{ color: "#379137bd" }} />
-                    </IconButton>
-                  </Tooltip>
-
-                  <Tooltip title="Excluir">
-                    <IconButton onClick={() => handleDelete(setMsg.id)}>
-                      <DeleteIcon sx={{ color: "#b72525b8" }} />
                     </IconButton>
                   </Tooltip>
                 </TableCell>
