@@ -14,14 +14,14 @@
 ---
 
 **Tecnologias Utilizadas**
--React.js
--Material UI (MUI)
--Axios
--React Router DOM
--React Hook Form
--Framer Motion
--React Icons
--SweetAlert2
+- React.js
+- Material UI (MUI)
+- Axios
+- React Router DOM
+- React Hook Form
+- Framer Motion
+- React Icons
+- SweetAlert2
 
 
 **Instalação e Execução**
