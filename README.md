@@ -13,8 +13,7 @@
 
 ---
 
-## 🚀 **Tecnologias Utilizadas**
-
+**Tecnologias Utilizadas**
 -React.js
 -Material UI (MUI)
 -Axios
@@ -25,7 +24,7 @@
 -SweetAlert2
 
 
-## 📦 **Instalação e Execução**
+**Instalação e Execução**
 Instalar as dependências:
     npm: npm install
 
@@ -36,7 +35,7 @@ Build de produção (opcional):
     npm: npm run build
 
 
-### 🔧 Pré-requisitos
+**Pré-requisitos**
 Certifique-se de ter instalado:
 - [Node.js](https://nodejs.org/) (versão LTS recomendada)
 - [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/)
